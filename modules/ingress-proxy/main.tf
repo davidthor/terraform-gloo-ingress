@@ -52,6 +52,16 @@ resource "kubernetes_deployment" "ingress_proxy" {
       }
 
       spec {
+        service_account_name = "${var.service_account_name}"
+
+        volume {
+          name = "${var.service_account_secret_name}"
+
+          secret {
+            secret_name = "${var.service_account_secret_name}"
+          }
+        }
+
         volume {
           name = "envoy-config"
 
@@ -69,6 +79,12 @@ resource "kubernetes_deployment" "ingress_proxy" {
           volume_mount {
             mount_path = "/etc/envoy"
             name = "envoy-config"
+          }
+
+          volume_mount {
+            mount_path = "/var/run/secrets/kubernetes.io/serviceaccount"
+            name = "${var.service_account_secret_name}"
+            read_only = true
           }
 
           port {

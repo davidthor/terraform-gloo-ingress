@@ -2,6 +2,14 @@ variable "namespace" {
   type = "string"
 }
 
+variable "service_account_name" {
+  type = "string"
+}
+
+variable "service_account_secret_name" {
+  type = "string"
+}
+
 variable "xds_port" {
   type = "string"
 }

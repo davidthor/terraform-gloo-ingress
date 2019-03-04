@@ -55,7 +55,7 @@ resource "kubernetes_cluster_role_binding" "gloo_role_binding" {
 
   subject {
     kind = "ServiceAccount"
-    name = "default"
+    name = "${var.service_account}"
     namespace = "${var.namespace}"
     api_group = ""
   }

@@ -28,6 +28,16 @@ resource "kubernetes_deployment" "gloo" {
       }
 
       spec {
+        service_account_name = "${var.service_account_name}"
+
+        volume {
+          name = "${var.service_account_secret_name}"
+
+          secret {
+            secret_name = "${var.service_account_secret_name}"
+          }
+        }
+
         container {
           name = "gloo"
           image = "${var.container_image}:${var.container_tag}"
@@ -37,6 +47,12 @@ resource "kubernetes_deployment" "gloo" {
             container_port = "${var.xds_port}"
             name = "grpc"
             protocol = "TCP"
+          }
+
+          volume_mount {
+            mount_path = "/var/run/secrets/kubernetes.io/serviceaccount"
+            name = "${var.service_account_secret_name}"
+            read_only = true
           }
 
           env {
