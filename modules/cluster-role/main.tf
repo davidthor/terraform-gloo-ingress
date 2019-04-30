@@ -1,5 +1,3 @@
-provider "kubernetes" {}
-
 resource "kubernetes_cluster_role" "gloo_role" {
   metadata {
     name = "gloo-role"

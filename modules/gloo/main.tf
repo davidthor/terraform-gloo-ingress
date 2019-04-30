@@ -1,5 +1,3 @@
-provider "kubernetes" {}
-
 resource "kubernetes_deployment" "gloo" {
   metadata {
     name = "gloo"

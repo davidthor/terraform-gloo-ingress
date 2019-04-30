@@ -1,5 +1,3 @@
-provider "null" {}
-
 data "template_file" "gloo_settings" {
   template = "${file("${path.module}/settings.yml.tpl")}"
 
@@ -19,7 +17,7 @@ resource "null_resource" "gloo_settings" {
   }
 
   provisioner "local-exec" {
-    command = "kubectl apply -f -<<EOF\n${data.template_file.gloo_settings.rendered}\nEOF"
+    command = "${format("kubectl apply -f -<<EOF\n%s\nEOF", data.template_file.gloo_settings.rendered)}"
   }
 }
 
@@ -29,6 +27,6 @@ resource "null_resource" "gloo_crd_settings" {
   }
 
   provisioner "local-exec" {
-    command = "kubectl apply -f -<<EOF\n${data.template_file.gloo_crd_settings.rendered}\nEOF"
+    command = "${format("kubectl apply -f -<<EOF\n%s\nEOF", data.template_file.gloo_crd_settings.rendered)}"
   }
 }

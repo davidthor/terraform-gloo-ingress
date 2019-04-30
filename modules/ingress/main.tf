@@ -1,5 +1,3 @@
-provider "kubernetes" {}
-
 resource "kubernetes_deployment" "ingress" {
   metadata {
     name = "ingress"

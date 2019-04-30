@@ -1,5 +1,3 @@
-provider "kubernetes" {}
-
 data "template_file" "envoy_config" {
   template = "${file("${path.module}/envoy-config.yml.tpl")}"
 
