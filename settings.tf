@@ -12,6 +12,8 @@ data "template_file" "gloo_crd_settings" {
 }
 
 resource "null_resource" "gloo_settings" {
+  depends_on = ["kubernetes_namespace.gloo_namespace"]
+
   triggers {
     manifest_sha1 = "${sha1(data.template_file.gloo_settings.rendered)}"
   }
@@ -22,6 +24,8 @@ resource "null_resource" "gloo_settings" {
 }
 
 resource "null_resource" "gloo_crd_settings" {
+  depends_on = ["kubernetes_namespace.gloo_namespace"]
+
   triggers {
     manifest_sha1 = "${sha1(data.template_file.gloo_crd_settings.rendered)}"
   }
