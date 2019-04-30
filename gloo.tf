@@ -1,7 +1,7 @@
 resource "kubernetes_deployment" "gloo" {
   metadata {
     name = "gloo"
-    namespace = "${var.namespace}"
+    namespace = "${kubernetes_namespace.gloo_namespace.metadata.0.name}"
 
     labels {
       app = "gloo"
@@ -10,7 +10,7 @@ resource "kubernetes_deployment" "gloo" {
   }
 
   spec {
-    replicas = "${var.replicas}"
+    replicas = "${var.gloo_service_replicas}"
 
     selector {
       match_labels {
@@ -26,19 +26,19 @@ resource "kubernetes_deployment" "gloo" {
       }
 
       spec {
-        service_account_name = "${var.service_account_name}"
+        service_account_name = "${kubernetes_service_account.gloo_service_account.metadata.0.name}"
 
         volume {
-          name = "${var.service_account_secret_name}"
+          name = "${kubernetes_service_account.gloo_service_account.default_secret_name}"
 
           secret {
-            secret_name = "${var.service_account_secret_name}"
+            secret_name = "${kubernetes_service_account.gloo_service_account.default_secret_name}"
           }
         }
 
         container {
           name = "gloo"
-          image = "${var.container_image}:${var.container_tag}"
+          image = "${var.gloo_service_image}:${var.gloo_service_image_tag}"
           image_pull_policy = "Always"
 
           port {
@@ -49,7 +49,7 @@ resource "kubernetes_deployment" "gloo" {
 
           volume_mount {
             mount_path = "/var/run/secrets/kubernetes.io/serviceaccount"
-            name = "${var.service_account_secret_name}"
+            name = "${kubernetes_service_account.gloo_service_account.default_secret_name}"
             read_only = true
           }
 
@@ -71,7 +71,7 @@ resource "kubernetes_deployment" "gloo" {
 resource "kubernetes_service" "gloo" {
   metadata {
     name = "gloo"
-    namespace = "${var.namespace}"
+    namespace = "${kubernetes_namespace.gloo_namespace.metadata.0.name}"
 
     labels {
       app = "gloo"

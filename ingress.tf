@@ -1,7 +1,7 @@
 resource "kubernetes_deployment" "ingress" {
   metadata {
     name = "ingress"
-    namespace = "${var.namespace}"
+    namespace = "${kubernetes_namespace.gloo_namespace.metadata.0.name}"
 
     labels {
       app = "gloo"
@@ -10,7 +10,7 @@ resource "kubernetes_deployment" "ingress" {
   }
 
   spec {
-    replicas = "${var.replicas}"
+    replicas = "${var.ingress_service_replicas}"
 
     selector {
       match_labels {
@@ -26,24 +26,24 @@ resource "kubernetes_deployment" "ingress" {
       }
 
       spec {
-        service_account_name = "${var.service_account_name}"
+        service_account_name = "${kubernetes_service_account.gloo_service_account.metadata.0.name}"
 
         volume {
-          name = "${var.service_account_secret_name}"
+          name = "${kubernetes_service_account.gloo_service_account.default_secret_name}"
 
           secret {
-            secret_name = "${var.service_account_secret_name}"
+            secret_name = "${kubernetes_service_account.gloo_service_account.default_secret_name}"
           }
         }
 
         container {
           name = "ingress"
-          image = "${var.container_image}:${var.container_tag}"
+          image = "${var.ingress_service_image}:${var.ingress_service_image_tag}"
           image_pull_policy = "Always"
 
           volume_mount {
             mount_path = "/var/run/secrets/kubernetes.io/serviceaccount"
-            name = "${var.service_account_secret_name}"
+            name = "${kubernetes_service_account.gloo_service_account.default_secret_name}"
             read_only = true
           }
 

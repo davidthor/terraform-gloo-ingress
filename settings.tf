@@ -1,14 +1,14 @@
 data "template_file" "gloo_settings" {
-  template = "${file("${path.module}/settings.yml.tpl")}"
+  template = "${file("${path.module}/kubernetes-templates/settings.yml.tpl")}"
 
   vars {
-    NAMESPACE = "${var.namespace}"
+    NAMESPACE = "${kubernetes_namespace.gloo_namespace.metadata.0.name}"
     GLOO_DEPLOYMENT_XDS_PORT = "${var.xds_port}"
   }
 }
 
 data "template_file" "gloo_crd_settings" {
-  template = "${file("${path.module}/settings-crd.yml.tpl")}"
+  template = "${file("${path.module}/kubernetes-templates/settings-crd.yml.tpl")}"
 }
 
 resource "null_resource" "gloo_settings" {

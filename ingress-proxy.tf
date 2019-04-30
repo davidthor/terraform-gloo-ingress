@@ -1,5 +1,5 @@
 data "template_file" "envoy_config" {
-  template = "${file("${path.module}/envoy-config.yml.tpl")}"
+  template = "${file("${path.module}/kubernetes-templates/envoy-config.yml.tpl")}"
 
   vars {
     GLOO_SERVICE_NAME = "gloo"
@@ -10,7 +10,7 @@ data "template_file" "envoy_config" {
 resource "kubernetes_config_map" "ingress_envoy_config" {
   metadata {
     name = "ingress-envoy-config"
-    namespace = "${var.namespace}"
+    namespace = "${kubernetes_namespace.gloo_namespace.metadata.0.name}"
 
     labels {
       app = "gloo"
@@ -25,7 +25,7 @@ resource "kubernetes_config_map" "ingress_envoy_config" {
 resource "kubernetes_deployment" "ingress_proxy" {
   metadata {
     name = "ingress-proxy"
-    namespace = "${var.namespace}"
+    namespace = "${kubernetes_namespace.gloo_namespace.metadata.0.name}"
 
     labels {
       app = "gloo"
@@ -34,7 +34,7 @@ resource "kubernetes_deployment" "ingress_proxy" {
   }
 
   spec {
-    replicas = "${var.replicas}"
+    replicas = "${var.ingress_proxy_service_replicas}"
 
     selector {
       match_labels {
@@ -50,13 +50,13 @@ resource "kubernetes_deployment" "ingress_proxy" {
       }
 
       spec {
-        service_account_name = "${var.service_account_name}"
+        service_account_name = "${kubernetes_service_account.gloo_service_account.metadata.0.name}"
 
         volume {
-          name = "${var.service_account_secret_name}"
+          name = "${kubernetes_service_account.gloo_service_account.default_secret_name}"
 
           secret {
-            secret_name = "${var.service_account_secret_name}"
+            secret_name = "${kubernetes_service_account.gloo_service_account.default_secret_name}"
           }
         }
 
@@ -70,7 +70,7 @@ resource "kubernetes_deployment" "ingress_proxy" {
 
         container {
           name = "ingress-proxy"
-          image = "${var.container_image}:${var.container_tag}"
+          image = "${var.ingress_proxy_service_image}:${var.ingress_proxy_service_image_tag}"
           image_pull_policy = "Always"
           args = ["--disable-hot-restart"]
 
@@ -81,20 +81,20 @@ resource "kubernetes_deployment" "ingress_proxy" {
 
           volume_mount {
             mount_path = "/var/run/secrets/kubernetes.io/serviceaccount"
-            name = "${var.service_account_secret_name}"
+            name = "${kubernetes_service_account.gloo_service_account.default_secret_name}"
             read_only = true
           }
 
           port {
             name = "http"
             protocol = "TCP"
-            container_port = "${var.http_port}"
+            container_port = "${var.proxy_http_port}"
           }
 
           port {
             name = "https"
             protocol = "TCP"
-            container_port = "${var.https_port}"
+            container_port = "${var.proxy_https_port}"
           }
 
           env {
@@ -125,7 +125,7 @@ resource "kubernetes_deployment" "ingress_proxy" {
 resource "kubernetes_service" "ingress_proxy" {
   metadata {
     name = "ingress-proxy"
-    namespace = "${var.namespace}"
+    namespace = "${kubernetes_namespace.gloo_namespace.metadata.0.name}"
 
     labels {
       app = "gloo"
@@ -143,13 +143,13 @@ resource "kubernetes_service" "ingress_proxy" {
     port {
       name = "http"
       protocol = "TCP"
-      port = "${var.http_port}"
+      port = "${var.proxy_http_port}"
     }
 
     port {
       name = "https"
       protocol = "TCP"
-      port = "${var.https_port}"
+      port = "${var.proxy_https_port}"
     }
   }
 }
