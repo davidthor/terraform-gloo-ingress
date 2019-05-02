@@ -1,6 +1,11 @@
 resource "kubernetes_cluster_role" "gloo_role" {
   metadata {
-    name = "gloo-role"
+    name = "gloo-role-ingress"
+
+    labels {
+      app = "gloo"
+      gloo = "rbac"
+    }
   }
 
   rule {
@@ -42,7 +47,12 @@ resource "kubernetes_cluster_role" "gloo_role" {
 
 resource "kubernetes_cluster_role_binding" "gloo_role_binding" {
   metadata {
-    name = "gloo-role-binding"
+    name = "gloo-role-binding-ingress-gloo-system"
+
+    labels {
+      app = "gloo"
+      gloo = "rbac"
+    }
   }
 
   role_ref {

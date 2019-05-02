@@ -18,11 +18,11 @@ variable "gloo_service_replicas" {
 }
 
 variable "gloo_service_image" {
-  default = "soloio/gloo"
+  default = "quay.io/solo-io/gloo"
 }
 
 variable "gloo_service_image_tag" {
-  default = "0.8.6"
+  default = "0.13.19"
 }
 
 variable "discovery_service_replicas" {
@@ -30,11 +30,11 @@ variable "discovery_service_replicas" {
 }
 
 variable "discovery_service_image" {
-  default = "soloio/discovery"
+  default = "quay.io/solo-io/discovery"
 }
 
 variable "discovery_service_image_tag" {
-  default = "0.8.6"
+  default = "0.13.19"
 }
 
 variable "ingress_service_replicas" {
@@ -42,11 +42,11 @@ variable "ingress_service_replicas" {
 }
 
 variable "ingress_service_image" {
-  default = "soloio/ingress"
+  default = "quay.io/solo-io/ingress"
 }
 
 variable "ingress_service_image_tag" {
-  default = "0.8.6"
+  default = "0.13.19"
 }
 
 variable "ingress_proxy_service_replicas" {
@@ -54,11 +54,11 @@ variable "ingress_proxy_service_replicas" {
 }
 
 variable "ingress_proxy_service_image" {
-  default = "soloio/gloo-envoy-wrapper"
+  default = "quay.io/solo-io/gloo-envoy-wrapper"
 }
 
 variable "ingress_proxy_service_image_tag" {
-  default = "0.8.6"
+  default = "0.13.19"
 }
 
 variable "proxy_http_port" {
@@ -67,4 +67,8 @@ variable "proxy_http_port" {
 
 variable "proxy_https_port" {
   default = 443
+}
+
+variable "kubeconfig_file_path" {
+  default = ""
 }

@@ -30,7 +30,6 @@ resource "kubernetes_deployment" "ingress" {
 
         volume {
           name = "${kubernetes_service_account.gloo_service_account.default_secret_name}"
-
           secret {
             secret_name = "${kubernetes_service_account.gloo_service_account.default_secret_name}"
           }

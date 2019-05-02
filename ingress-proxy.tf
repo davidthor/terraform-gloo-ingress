@@ -1,5 +1,5 @@
 data "template_file" "envoy_config" {
-  template = "${file("${path.module}/kubernetes-templates/envoy-config.yml.tpl")}"
+  template = "${file("${path.module}/envoy-config.yml.tpl")}"
 
   vars {
     GLOO_SERVICE_NAME = "gloo"
@@ -14,6 +14,7 @@ resource "kubernetes_config_map" "ingress_envoy_config" {
 
     labels {
       app = "gloo"
+      gloo = "gateway-proxy"
     }
   }
 
@@ -54,7 +55,6 @@ resource "kubernetes_deployment" "ingress_proxy" {
 
         volume {
           name = "${kubernetes_service_account.gloo_service_account.default_secret_name}"
-
           secret {
             secret_name = "${kubernetes_service_account.gloo_service_account.default_secret_name}"
           }
@@ -74,15 +74,25 @@ resource "kubernetes_deployment" "ingress_proxy" {
           image_pull_policy = "Always"
           args = ["--disable-hot-restart"]
 
-          volume_mount {
-            mount_path = "/etc/envoy"
-            name = "envoy-config"
+          security_context {
+            read_only_root_filesystem = true
+            allow_privilege_escalation = false
+
+            capabilities {
+              drop = ["ALL"]
+              add = ["NET_BIND_SERVICE"]
+            }
           }
 
           volume_mount {
             mount_path = "/var/run/secrets/kubernetes.io/serviceaccount"
             name = "${kubernetes_service_account.gloo_service_account.default_secret_name}"
             read_only = true
+          }
+
+          volume_mount {
+            mount_path = "/etc/envoy"
+            name = "envoy-config"
           }
 
           port {
