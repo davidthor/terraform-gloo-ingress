@@ -34,7 +34,7 @@ resource "kubernetes_cluster_role" "gloo_role" {
 
   rule {
     api_groups = ["gloo.solo.io"]
-    resources = ["settings", "upstreams", "proxies","virtualservices"]
+    resources = ["settings", "upstreams", "upstreamgroups", "proxies","virtualservices"]
     verbs = ["*"]
   }
 
